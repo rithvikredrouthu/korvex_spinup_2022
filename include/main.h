@@ -93,15 +93,15 @@ const int chassis_rm_port = 9;
 const int chassis_rb_port = 10;
 
 const int intake_port = 15;
-const int cata_port = 19;
+const int cata_port = 16;
 
 // sensor ports
-const int imu_port = 11;
-const std::uint8_t limit_switch_port = 'H';
+const int imu_port = 13;
+const std::uint8_t limit_switch_port = 'B';
 
 //piston ports
-const std::uint8_t endgame_left_port = 'A';
-const std::uint8_t endgame_right_port = 'B';
+const std::uint8_t endgame_left_port = 'D';
+const std::uint8_t endgame_right_port = 'E';
 
 // motors
 extern pros::Motor chassis_lf;
