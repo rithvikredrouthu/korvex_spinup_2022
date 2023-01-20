@@ -1,4 +1,5 @@
 #include "autons.hpp"
+#include "EZ-Template/drive/drive.hpp"
 #include "main.h"
 
 
@@ -250,5 +251,7 @@ void interfered_example() {
 // Make your own autonomous functions here!
 // . . .
 
-
-
+void first_auton() {
+  chassis.set_drive_pid(-5, 20);
+  intake = -50;
+}
