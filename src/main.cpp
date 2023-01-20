@@ -2,6 +2,7 @@
 #include "pros/adi.h"
 #include "pros/adi.hpp"
 #include "pros/misc.h"
+#include "pros/motors.h"
 #include "pros/rtos.hpp"
 
 
@@ -54,6 +55,25 @@
 // 	return LV_RES_OK;
 // }
 
+// static lv_res_t ResetBtnAction(lv_obj_t *btn) {
+// 	imu.reset();
+
+// 	leftDrive.tarePosition();
+// 	rightDrive.tarePosition();
+
+// 	while (imu.is_calibrating() and pros::millis() < 5000)
+// 	{
+// 		pros::delay(10);
+// 	}
+// 	if (pros::millis() < 5000) std::cout << pros::millis() << ": finished calibrating!" << std::endl;
+// 	return LV_RES_OK;
+// }
+
+// static lv_res_t noAutonBtnAction(lv_obj_t *btn) {
+// 	autonSelection = autonStates::off;
+// 	std::cout << pros::millis() << "None" << std::endl;
+// 	return LV_RES_OK;
+// }
 
 // Chassis constructor
 Drive chassis (
@@ -63,10 +83,10 @@ Drive chassis (
 
   // Right Chassis Ports (negative port will reverse it!)
   //   the first port is the sensored port (when trackers are not used!)
-  ,{-chassis_rf_port, -chassis_rm_port, -chassis_rb_port}
+  ,{chassis_rf_port, chassis_rm_port, chassis_rb_port}
 
   // IMU Port
-  ,imu_port
+  ,11
 
   // Wheel Diameter (Remember, 4" wheels are actually 4.125!)
   //    (or tracking wheel diameter)
@@ -80,7 +100,7 @@ Drive chassis (
   //    (or gear ratio of tracking wheel)
   // eg. if your drive is 84:36 where the 36t is powered, your RATIO would be 2.333.
   // eg. if your drive is 36:60 where the 60t is powered, your RATIO would be 0.6.
-  ,60.0/36.0
+  ,36.0/60.0
 
   // Uncomment if using tracking wheels
   /*
@@ -127,7 +147,7 @@ void initialize() {
 	if (pros::millis() < 5000) std::cout << pros::millis() << ": finished calibrating!" << std::endl;
 	else std::cout << pros::millis() << ": calibration failed, moving on" << std::endl;
 
-	std::cout << pros::millis() << ": lift: " << cata.get_temperature() << std::endl;
+	std::cout << pros::millis() << ": cata: " << cata.get_temperature() << std::endl;
 	std::cout << pros::millis() << ": intake: " << intake.get_temperature() << std::endl;
 	std::cout << pros::millis() << ": chassisLF: " << chassis_lf.get_temperature() << std::endl;
 	std::cout << pros::millis() << ": chassisLM: " << chassis_lm.get_temperature() << std::endl;
@@ -209,10 +229,14 @@ void autonomous() {
 void opcontrol() {
 
   // This is preference to what you like to drive on.
+
   chassis.set_drive_brake(MOTOR_BRAKE_COAST);
   intake.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+  cata.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+
 
   bool intake_on = false;
+  bool roller_on = false;
 
   int shooter_time = 0;
   int cata_state = 0;
@@ -236,17 +260,16 @@ void opcontrol() {
       intake = 127*intake_on;
     }
     
-    if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) {
-      intake = -127;
-    } else {
-      intake = 0;
+    if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_L1)) {
+      roller_on = !roller_on;
+      intake = -127*roller_on;
     }
 
 	  // cata
     if (cata_state == 0) {
       if (!limit_switch.get_value()) {
         cata.move(127);
-      } else {
+      } else {              
         cata.move(0);
       }
 
@@ -261,6 +284,7 @@ void opcontrol() {
 
       if ((pros::millis() - shooter_time) > 250) {
         cata_state = 0;
+        shooter_time = pros::millis();
       }
     }
 
