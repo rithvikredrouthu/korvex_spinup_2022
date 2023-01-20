@@ -20,10 +20,4 @@ void modified_exit_condition();
 
 
 // change names later
-void Diagonal();
-void DiagonalMiddle();
-void DiagonalDouble();
-void Platform();
-void SoloWP();
-void skills();
-void test();
+void first_auton();
