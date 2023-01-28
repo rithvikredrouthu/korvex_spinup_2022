@@ -17,6 +17,8 @@
 // 	test
 // };
 
+bool driverDisabled = false;
+
 // autonStates autonSelection = autonStates::off;
 
 // static lv_res_t DiagonalBtnAction(lv_obj_t *btn) {
@@ -79,14 +81,14 @@
 Drive chassis (
   // Left Chassis Ports (negative port will reverse it!)
   //   the first port is the sensored port (when trackers are not used!)
-  {-chassis_lf_port, -chassis_lm_port, -chassis_lb_port}
+  {-chassis_lf_port, -chassis_lm_port, chassis_lb_port}
 
   // Right Chassis Ports (negative port will reverse it!)
   //   the first port is the sensored port (when trackers are not used!)
-  ,{chassis_rf_port, chassis_rm_port, chassis_rb_port}
+  ,{-chassis_rf_port, chassis_rm_port, -chassis_rb_port}
 
   // IMU Port
-  ,11
+  ,imu_port
 
   // Wheel Diameter (Remember, 4" wheels are actually 4.125!)
   //    (or tracking wheel diameter)
@@ -156,6 +158,12 @@ void initialize() {
 	std::cout << pros::millis() << ": chassisRM: " << chassis_rm.get_temperature() << std::endl;
 	std::cout << pros::millis() << ": chassisRB: " << chassis_rb.get_temperature() << std::endl;
   // Initialize chassis and auton selector
+
+	pros::ADIDigitalOut piston1(endgame_left_port, false);
+	pros::ADIDigitalOut piston2(endgame_right_port, false);
+  pros::ADIDigitalOut piston3(boost_left_port, true);
+	pros::ADIDigitalOut piston4(boost_right_port, true);  
+
   chassis.initialize();
   default_constants();
   one_mogo_constants();
@@ -171,7 +179,10 @@ void initialize() {
  * the robot is enabled, this task will exit.
  */
 void disabled() {
-  // . . .
+	pros::ADIDigitalOut piston1(endgame_left_port, false);
+	pros::ADIDigitalOut piston2(endgame_right_port, false);
+  pros::ADIDigitalOut piston3(boost_left_port, true);
+	pros::ADIDigitalOut piston4(boost_right_port, true);
 }
 
 
@@ -203,6 +214,8 @@ void competition_initialize() {
  * from where it left off.
  */
 void autonomous() {
+  driverDisabled = true;
+
   chassis.reset_pid_targets(); // Resets PID targets to 0
   chassis.reset_gyro(); // Reset gyro position to 0
   chassis.reset_drive_sensor(); // Reset drive sensors to 0
@@ -228,11 +241,13 @@ void autonomous() {
  */
 void opcontrol() {
 
+  driverDisabled = false;
+
   // This is preference to what you like to drive on.
 
   chassis.set_drive_brake(MOTOR_BRAKE_COAST);
   intake.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
-  cata.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+  cata.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
 
 
   bool intake_on = false;
@@ -286,6 +301,11 @@ void opcontrol() {
         cata_state = 0;
         shooter_time = pros::millis();
       }
+    }
+
+    if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_Y)) {
+      piston1.set_value(true);
+      piston2.set_value(true);
     }
 
     pros::delay(ez::util::DELAY_TIME); // This is used for timer calculations!  Keep this ez::util::DELAY_TIME
