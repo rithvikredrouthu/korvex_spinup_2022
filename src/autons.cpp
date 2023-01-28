@@ -252,6 +252,6 @@ void interfered_example() {
 // . . .
 
 void first_auton() {
-  chassis.set_drive_pid(-5, 20);
+  chassis.set_drive_pid(-2, DRIVE_SPEED);
   intake = -50;
 }

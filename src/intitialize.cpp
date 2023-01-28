@@ -14,8 +14,11 @@ pros::Motor cata(cata_port, pros::E_MOTOR_GEARSET_36, false, pros::E_MOTOR_ENCOD
 
 pros::Controller master(pros::E_CONTROLLER_MASTER);
 
-pros::ADIDigitalOut endgame_left(endgame_left_port, false);
-pros::ADIDigitalOut endgame_right(endgame_right_port, false);
+pros::ADIDigitalOut piston1(endgame_left_port, false);
+pros::ADIDigitalOut piston2(endgame_right_port, false);
+
+pros::ADIDigitalOut piston3(boost_left_port, false);
+pros::ADIDigitalOut piston4(boost_right_port, false);
 
 pros::Imu imu(imu_port);
 
