@@ -97,11 +97,14 @@ const int cata_port = 16;
 
 // sensor ports
 const int imu_port = 13;
-const std::uint8_t limit_switch_port = 'B';
+const std::uint8_t limit_switch_port = 'A';
 
 //piston ports
-const std::uint8_t endgame_left_port = 'D';
-const std::uint8_t endgame_right_port = 'E';
+const std::uint8_t endgame_left_port = 'B';
+const std::uint8_t endgame_right_port = 'C';
+
+const std::uint8_t boost_left_port = 'D';
+const std::uint8_t boost_right_port = 'E';
 
 // motors
 extern pros::Motor chassis_lf;
@@ -114,11 +117,17 @@ extern pros::Motor chassis_rb;
 extern pros::Motor intake;
 extern pros::Motor cata;
 
-//pistons
+// endgame pistons
 extern pros::ADIDigitalOut piston1;
 extern pros::ADIDigitalOut piston2;
 
-//sensors
+// auton pistons
+extern pros::ADIDigitalOut piston3;
+extern pros::ADIDigitalOut piston4;
+
+// sensors
+
+// ask akhil where to mount imu
 extern pros::Imu imu;
 extern pros::ADIDigitalIn limit_switch;
 
