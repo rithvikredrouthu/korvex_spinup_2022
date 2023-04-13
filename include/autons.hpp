@@ -13,11 +13,13 @@ void combining_movements();
 void interfered_example();
 
 void default_constants();
-void one_mogo_constants();
+void one_mogo_constanQts();
 void two_mogo_constants();
 void exit_condition_defaults();
 void modified_exit_condition();
 
 
-// change names later
-void first_auton();
+void skills();
+void roller();
+void off_roller();
+void awp();

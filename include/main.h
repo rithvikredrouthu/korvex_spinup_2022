@@ -39,14 +39,10 @@
 /**
  * You should add more #includes here
  */
-//#include "okapi/api.hpp"
-//#include "pros/api_legacy.h"
+// #include "okapi/api.hpp"
+// #include "pros/api_legacy.h"
 #include "EZ-Template/api.hpp"
 #include "autons.hpp"
-
-// More includes here...
-//
-// . . .
 
 /**
  * If you find doing pros::Motor() to be tedious and you'd prefer just to do
@@ -84,27 +80,36 @@ void opcontrol(void);
 //#include <iostream>
 #endif
 
-// motor ports
-const int chassis_lf_port = 5;
-const int chassis_lm_port = 6;
-const int chassis_lb_port = 7;
-const int chassis_rf_port = 8;
-const int chassis_rm_port = 9;
-const int chassis_rb_port = 10;
+#ifndef THREADS
+#define THREADS
+#include "threads.h"
+#endif
 
-const int intake_port = 15;
-const int cata_port = 16;
+#ifndef BASICOP
+#define BASICOP
+#include "basicop.h"
+#endif
+
+// motor ports
+const int chassis_lf_port = 18;
+const int chassis_lm_port = 20;
+const int chassis_lb_port = 9;
+const int chassis_rf_port = 14;
+const int chassis_rm_port = 3;
+const int chassis_rb_port = 2;
+
+const int intake_port = 4;
+const int cata_port = 17;
 
 // sensor ports
-const int imu_port = 13;
-const std::uint8_t limit_switch_port = 'A';
+const int imu_port = 12;
+const std::uint8_t limit_switch_port = 'H';
 
 //piston ports
-const std::uint8_t endgame_left_port = 'B';
-const std::uint8_t endgame_right_port = 'C';
+const std::uint8_t boost_port = 'C';
+const std::uint8_t left_endgame_port = 'A';
+const std::uint8_t right_endgame_port = 'B';
 
-const std::uint8_t boost_left_port = 'D';
-const std::uint8_t boost_right_port = 'E';
 
 // motors
 extern pros::Motor chassis_lf;
@@ -118,16 +123,14 @@ extern pros::Motor intake;
 extern pros::Motor cata;
 
 // endgame pistons
-extern pros::ADIDigitalOut piston1;
-extern pros::ADIDigitalOut piston2;
+extern pros::ADIDigitalOut left_endgame;
+extern pros::ADIDigitalOut right_endgame;
 
 // auton pistons
-extern pros::ADIDigitalOut piston3;
-extern pros::ADIDigitalOut piston4;
+extern pros::ADIDigitalOut boost;
 
 // sensors
 
-// ask akhil where to mount imu
 extern pros::Imu imu;
 extern pros::ADIDigitalIn limit_switch;
 
