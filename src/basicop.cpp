@@ -1,20 +1,21 @@
 #include "main.h"
+#include "pros/rtos.hpp"
 #include <fstream>
 
 void spinIntake() {
-  intake.move(600);
+  intake.move_velocity(-600);
 }
 
 void outtake() {
-  intake.move(-600);
+  intake.move_velocity(600);
 }
 
 void spinRollers() {
-  intake.move(400);
+  intake.move_velocity(400);
 }
 
 void stopIntake() {
-  intake.move(0);
+  intake.move_velocity(0);
 }
 
 void wait(int sec) {
@@ -22,30 +23,12 @@ void wait(int sec) {
 }
 
 void endgame() {
-  piston1.set_value(true);
-  piston2.set_value(true);
+  left_endgame.set_value(true);
+  right_endgame.set_value(true);
 }
 
-int cata_shoot_state = 0;
-int cata_shooter_time = 0;
-void shoot(){
-    cata_shoot_state = 1;
-    cata_shooter_time = pros::millis();
-
-    if (cata_shoot_state == 0) {
-      if (!limit_switch.get_value()) {
-        cata.move(127);
-      } else {              
-        cata.move(0);
-      }
-    }
-
-    if (cata_shoot_state == 1) {
-      cata.move(127);
-
-      if ((pros::millis() - cata_shooter_time) > 250) {
-        cata_shoot_state = 0;
-        cata_shooter_time = pros::millis();
-      }
-    }
+void auton_mode(bool mode) {
+  boost.set_value(mode);
 }
+
+

@@ -1,108 +1,42 @@
 #include "main.h"
+#include "EZ-Template/auton.hpp"
+#include "EZ-Template/sdcard.hpp"
+#include "autons.hpp"
 #include "pros/adi.h"
 #include "pros/adi.hpp"
 #include "pros/misc.h"
 #include "pros/motors.h"
 #include "pros/rtos.hpp"
 
-
-// enum class autonStates { // the possible auton selections, change names later
-// 	off,
-// 	Diagonal,
-// 	DiagonalMiddle,
-// 	DiagonalDouble,
-// 	Platform,
-// 	SoloWP,
-// 	Skills,
-// 	test
-// };
-
-bool driverDisabled = false;
-
-// autonStates autonSelection = autonStates::off;
-
-// static lv_res_t DiagonalBtnAction(lv_obj_t *btn) {
-// 	autonSelection = autonStates::Diagonal;
-// 	std::cout << pros::millis() << "Diagonal" << std::endl;
-// 	return LV_RES_OK;
-// }
-
-// static lv_res_t DiagonalMiddleBtnAction(lv_obj_t *btn) {
-// 	autonSelection = autonStates::DiagonalMiddle;
-// 	std::cout << pros::millis() << "DiagonalMiddle" << std::endl;
-// 	return LV_RES_OK;
-// }
-
-// static lv_res_t DiagonalDoubleBtnAction(lv_obj_t *btn) {
-// 	autonSelection = autonStates::DiagonalDouble;
-// 	std::cout << pros::millis() << "DiagonalDouble" << std::endl;
-// 	return LV_RES_OK;
-// }
-
-// static lv_res_t PlatformBtnAction(lv_obj_t *btn) {
-// 	autonSelection = autonStates::Platform;
-// 	std::cout << pros::millis() << "Platform" << std::endl;
-// 	return LV_RES_OK;
-// }
-
-// static lv_res_t SoloWPBtnAction(lv_obj_t *btn) {
-// 	autonSelection = autonStates::SoloWP;
-// 	std::cout << pros::millis() << "SoloWP" << std::endl;
-// 	return LV_RES_OK;
-// }
-
-// static lv_res_t SkillsBtnAction(lv_obj_t *btn) {
-// 	autonSelection = autonStates::Skills;
-// 	std::cout << pros::millis() << "Skills" << std::endl;
-// 	return LV_RES_OK;
-// }
-
-// static lv_res_t ResetBtnAction(lv_obj_t *btn) {
-// 	imu.reset();
-
-// 	leftDrive.tarePosition();
-// 	rightDrive.tarePosition();
-
-// 	while (imu.is_calibrating() and pros::millis() < 5000)
-// 	{
-// 		pros::delay(10);
-// 	}
-// 	if (pros::millis() < 5000) std::cout << pros::millis() << ": finished calibrating!" << std::endl;
-// 	return LV_RES_OK;
-// }
-
-// static lv_res_t noAutonBtnAction(lv_obj_t *btn) {
-// 	autonSelection = autonStates::off;
-// 	std::cout << pros::millis() << "None" << std::endl;
-// 	return LV_RES_OK;
-// }
+#include "autoSelect/selection.h"
+// #include "basicop.cpp"
 
 // Chassis constructor
 Drive chassis (
   // Left Chassis Ports (negative port will reverse it!)
   //   the first port is the sensored port (when trackers are not used!)
-  {-chassis_lf_port, -chassis_lm_port, chassis_lb_port}
+  {-chassis_lf_port, -chassis_lm_port, -chassis_lb_port}
 
   // Right Chassis Ports (negative port will reverse it!)
   //   the first port is the sensored port (when trackers are not used!)
-  ,{-chassis_rf_port, chassis_rm_port, -chassis_rb_port}
+  ,{chassis_rf_port, chassis_rm_port, chassis_rb_port}
 
   // IMU Port
   ,imu_port
 
   // Wheel Diameter (Remember, 4" wheels are actually 4.125!)
   //    (or tracking wheel diameter)
-  ,3.25
+  ,2.75
 
   // Cartridge RPM
   //   (or tick per rotation if using tracking wheels)
-  ,200
+  ,600
 
   // External Gear Ratio (MUST BE DECIMAL)
   //    (or gear ratio of tracking wheel)
   // eg. if your drive is 84:36 where the 36t is powered, your RATIO would be 2.333.
   // eg. if your drive is 36:60 where the 60t is powered, your RATIO would be 0.6.
-  ,36.0/60.0
+  ,36.0/48.0
 
   // Uncomment if using tracking wheels
   /*
@@ -122,13 +56,26 @@ Drive chassis (
 
 
 
-/**
+/** 
  * Runs initialization code. This occurs as soon as the program is started.
  *
  * All other competition modes are blocked by initialize; it is recommended
  * to keep execution time for this mode under a few seconds.
  */
+
+// void pull(void* param){
+//   while (!limit_switch.get_value()) {
+//       cata.move(127);
+//       pros::delay(10);
+//     }
+
+//     pros::delay(35);
+//     cata.move(0);
+// }
+
 void initialize() {
+
+  // pros::Task pull_task(pull);
 
   // Print our branding over your terminal :D
   imu.reset();
@@ -157,17 +104,20 @@ void initialize() {
 	std::cout << pros::millis() << ": chassisRF: " << chassis_rf.get_temperature() << std::endl;
 	std::cout << pros::millis() << ": chassisRM: " << chassis_rm.get_temperature() << std::endl;
 	std::cout << pros::millis() << ": chassisRB: " << chassis_rb.get_temperature() << std::endl;
-  // Initialize chassis and auton selector
 
-	pros::ADIDigitalOut piston1(endgame_left_port, false);
-	pros::ADIDigitalOut piston2(endgame_right_port, false);
-  pros::ADIDigitalOut piston3(boost_left_port, true);
-	pros::ADIDigitalOut piston4(boost_right_port, true);  
+
+  // Initialize chassis and auton selector
+  default_constants();
+  modified_exit_condition();
+  // one_mogo_constants();
+  // two_mogo_constants();
+
+  pros::ADIDigitalOut left_endgame(left_endgame_port, false);
+	pros::ADIDigitalOut right_endgame(right_endgame_port, false);
+  pros::ADIDigitalOut boost(boost_port, false);
 
   chassis.initialize();
-  default_constants();
-  one_mogo_constants();
-  two_mogo_constants();
+  selector::init();
 
 }
 
@@ -179,10 +129,9 @@ void initialize() {
  * the robot is enabled, this task will exit.
  */
 void disabled() {
-	pros::ADIDigitalOut piston1(endgame_left_port, false);
-	pros::ADIDigitalOut piston2(endgame_right_port, false);
-  pros::ADIDigitalOut piston3(boost_left_port, true);
-	pros::ADIDigitalOut piston4(boost_right_port, true);
+	pros::ADIDigitalOut left_endgame(left_endgame_port, false);
+	pros::ADIDigitalOut right_endgame(right_endgame_port, false);
+  pros::ADIDigitalOut boost(boost_port, false);
 }
 
 
@@ -200,7 +149,7 @@ void competition_initialize() {
   // . . .
 }
 
-
+pros::Task tcatapult(threadingCatapult, (void*)"PROS", TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "");
 
 /**
  * Runs the user autonomous code. This function will be started in its own task
@@ -214,14 +163,33 @@ void competition_initialize() {
  * from where it left off.
  */
 void autonomous() {
-  driverDisabled = true;
 
   chassis.reset_pid_targets(); // Resets PID targets to 0
   chassis.reset_gyro(); // Reset gyro position to 0
   chassis.reset_drive_sensor(); // Reset drive sensors to 0
   chassis.set_drive_brake(MOTOR_BRAKE_HOLD); // Set motors to hold.  This helps autonomous consistency.
 
-  ez::as::auton_selector.call_selected_auton(); // Calls selected auton from autonomous selector.
+	intake.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+  cata.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+
+
+  // Auton Selector
+  if (selector::auton == 0){ 
+    skills();
+  } else if (selector::auton == 1){ 
+    roller();
+  } else if (selector::auton == 2){ 
+    off_roller();
+  } else if (selector::auton == 3){ 
+    awp();
+  } else if (selector::auton == -1){ 
+    roller();
+  } else if (selector::auton == -2){ 
+    off_roller();
+  } else if (selector::auton == -3){ 
+    awp();
+  }
+
 }
 
 
@@ -241,20 +209,9 @@ void autonomous() {
  */
 void opcontrol() {
 
-  driverDisabled = false;
-
-  // This is preference to what you like to drive on.
-
-  chassis.set_drive_brake(MOTOR_BRAKE_COAST);
+  chassis.set_drive_brake(pros::E_MOTOR_BRAKE_COAST);
   intake.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
-  cata.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
-
-
-  bool intake_on = false;
-  bool roller_on = false;
-
-  int shooter_time = 0;
-  int cata_state = 0;
+  cata.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
 
   while (true) {
 
@@ -264,49 +221,18 @@ void opcontrol() {
     // chassis.arcade_flipped(ez::SPLIT); // Flipped split arcade
     // chassis.arcade_flipped(ez::SINGLE); // Flipped single arcade
 
-    // . . .
-    // Put more user control code here!
-    // . . .
+    if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) intake.move(127);
+    else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) intake.move(-100);
+    else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) intake.move(100);
+    else intake = 0;
 
+    if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R2)) shooting = true;
 
-    // intake and rollers
-    if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_L2)) {
-      intake_on = !intake_on;
-      intake = 127*intake_on;
-    }
-    
-    if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_L1)) {
-      roller_on = !roller_on;
-      intake = -127*roller_on;
-    }
+    if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_LEFT)) left_endgame.set_value(true);
+    if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_RIGHT)) right_endgame.set_value(true);
+    if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_UP)) left_endgame.set_value(true); right_endgame.set_value(true);
 
-	  // cata
-    if (cata_state == 0) {
-      if (!limit_switch.get_value()) {
-        cata.move(127);
-      } else {              
-        cata.move(0);
-      }
-
-      if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R2)) {
-        shooter_time = pros::millis();
-        cata_state = 1;
-      }
-    }
-
-    if (cata_state == 1) {
-      cata.move(127);
-
-      if ((pros::millis() - shooter_time) > 250) {
-        cata_state = 0;
-        shooter_time = pros::millis();
-      }
-    }
-
-    if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_Y)) {
-      piston1.set_value(true);
-      piston2.set_value(true);
-    }
+    if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_DOWN)) boost.set_value(true);
 
     pros::delay(ez::util::DELAY_TIME); // This is used for timer calculations!  Keep this ez::util::DELAY_TIME
   }
