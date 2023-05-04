@@ -63,21 +63,7 @@ Drive chassis (
  * to keep execution time for this mode under a few seconds.
  */
 
-// void pull(void* param){
-//   while (!limit_switch.get_value()) {
-//       cata.move(127);
-//       pros::delay(10);
-//     }
-
-//     pros::delay(35);
-//     cata.move(0);
-// }
-
 void initialize() {
-
-  // pros::Task pull_task(pull);
-
-  // Print our branding over your terminal :D
   imu.reset();
 	std::cout << pros::millis() << ": calibrating imu..." << std::endl;
 
@@ -118,7 +104,6 @@ void initialize() {
 
   chassis.initialize();
   selector::init();
-
 }
 
 
@@ -134,6 +119,9 @@ void disabled() {
   pros::ADIDigitalOut boost(boost_port, false);
 }
 
+pros::Task tcatapult(threadingCatapult, (void*)"PROS", TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "");
+pros::Task tchassis(threadingChassis, (void*)"PROS", TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "");
+pros::Task tintake(threadingIntake, (void*)"PROS", TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "");
 
 
 /**
@@ -143,13 +131,12 @@ void disabled() {
  * on the LCD.
  *
  * This task will exit when the robot is enabled and autonomous or opcontrol
- * starts.
+ * starts.Ga
  */
 void competition_initialize() {
   // . . .
 }
 
-pros::Task tcatapult(threadingCatapult, (void*)"PROS", TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "");
 
 /**
  * Runs the user autonomous code. This function will be started in its own task
@@ -171,7 +158,8 @@ void autonomous() {
 
 	intake.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
   cata.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-
+  tchassis.suspend();
+  tintake.suspend();
 
   // Auton Selector
   if (selector::auton == 0){ 
@@ -212,27 +200,22 @@ void opcontrol() {
   chassis.set_drive_brake(pros::E_MOTOR_BRAKE_COAST);
   intake.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
   cata.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-
+  tchassis.resume();
+  tintake.resume();
   while (true) {
 
-    chassis.tank(); // Tank control
+    // chassis.tank(); // Tank control
     // chassis.arcade_standard(ez::SPLIT); // Standard split arcade
     // chassis.arcade_standard(ez::SINGLE); // Standard single arcade
     // chassis.arcade_flipped(ez::SPLIT); // Flipped split arcade
     // chassis.arcade_flipped(ez::SINGLE); // Flipped single arcade
 
-    if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) intake.move(127);
-    else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) intake.move(-100);
-    else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) intake.move(100);
-    else intake = 0;
-
-    if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R2)) shooting = true;
 
     if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_LEFT)) left_endgame.set_value(true);
     if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_RIGHT)) right_endgame.set_value(true);
     if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_UP)) left_endgame.set_value(true); right_endgame.set_value(true);
 
-    if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_DOWN)) boost.set_value(true);
+    if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_DOWN)) auton_mode(true); wait(500); auton_mode(false);;
 
     pros::delay(ez::util::DELAY_TIME); // This is used for timer calculations!  Keep this ez::util::DELAY_TIME
   }

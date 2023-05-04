@@ -3,15 +3,15 @@
 #include <fstream>
 
 void spinIntake() {
-  intake.move_velocity(-600);
+  intake.move_velocity(575);
 }
 
 void outtake() {
-  intake.move_velocity(600);
+  intake.move_velocity(-600);
 }
 
 void spinRollers() {
-  intake.move_velocity(400);
+  intake.move_velocity(-400);
 }
 
 void stopIntake() {
@@ -29,6 +29,10 @@ void endgame() {
 
 void auton_mode(bool mode) {
   boost.set_value(mode);
+}
+
+void shoot() {
+  shooting = true;
 }
 
 

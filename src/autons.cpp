@@ -231,17 +231,169 @@ void interfered_example() {
 // . . .
 
 void roller() {
-  
+
+  chassis.set_drive_pid(4, DRIVE_SPEED, false);
+  chassis.wait_drive();
+  spinRollers();
+  wait(100);
+  chassis.set_drive_pid(-13, DRIVE_SPEED, true);
+  chassis.wait_drive();
+  stopIntake();
+  chassis.set_turn_pid(-14, TURN_SPEED);
+  chassis.wait_drive();
+  shoot();
+  wait(250);
+  chassis.set_drive_pid(7, DRIVE_SPEED, true);
+  chassis.wait_drive();
+  chassis.set_turn_pid(-135, TURN_SPEED);
+  chassis.wait_drive();
+  spinIntake();
+  chassis.set_drive_pid(19, 127, false);
+  chassis.wait_drive();
+  chassis.set_drive_pid(17, 50, true);
+  chassis.wait_drive();
+  chassis.set_turn_pid(-35, TURN_SPEED);
+  chassis.wait_drive();
+  chassis.set_drive_pid(-4, DRIVE_SPEED, true);
+  chassis.wait_drive();
+  stopIntake();
+  shoot();
+  wait(250);
+  chassis.set_turn_pid(-55, TURN_SPEED);
+  chassis.wait_drive();
+  chassis.set_drive_pid(34.5, 50, true);
+  chassis.wait_until(10);
+  chassis.set_swing_pid(ez::LEFT_SWING, 0, 50);
+  spinIntake();
+  chassis.wait_drive();
+  chassis.set_drive_pid(27, 50, true);
+  chassis.wait_drive();
+  chassis.set_swing_pid(ez::LEFT_SWING, -30, SWING_SPEED);
+  chassis.wait_drive();
+  chassis.set_drive_pid(-32, DRIVE_SPEED, true);
+  chassis.wait_drive();
+  stopIntake();
+  shoot();
+  wait(250);
+  auton_mode(true);
+  wait(500);
+  auton_mode(false);
+
+
+
+
+  // spinIntake();
+  // chassis.set_drive_pid(19, 127, false);
+  // chassis.wait_drive();
+  // chassis.set_drive_pid(19, 50, true);
+  // chassis.wait_drive();
+  // stopIntake();
 }
 
 
 void off_roller() {
-
+  chassis.set_drive_pid(7.5, DRIVE_SPEED, false);
+  chassis.wait_drive();
+  chassis.set_swing_pid(ez::LEFT_SWING, 90, SWING_SPEED);
+  chassis.wait_drive();
+  chassis.set_drive_pid(6, DRIVE_SPEED, false);
+  chassis.wait_drive();
+  spinRollers();
+  wait(100);
+  chassis.set_drive_pid(-12, DRIVE_SPEED, true);
+  chassis.wait_drive();
+  stopIntake();
+  chassis.set_turn_pid(104, TURN_SPEED);
+  chassis.wait_drive();
+  shoot();
+  wait(250);
+  chassis.set_drive_pid(6.5, DRIVE_SPEED, true);
+  chassis.wait_drive();
+  chassis.set_turn_pid(225, TURN_SPEED);
+  chassis.wait_drive();
+  spinIntake();
+  chassis.set_drive_pid(51, 35, true);
+  chassis.wait_drive();
+  chassis.set_swing_pid(ez::LEFT_SWING, 135, SWING_SPEED);
+  chassis.wait_drive();
+  chassis.set_drive_pid(2, DRIVE_SPEED, true);
+  chassis.wait_drive();
+  shoot();
+  // wait(250);
+  // chassis.set_drive_pid(5, DRIVE_SPEED, true);
+  // chassis.wait_drive();
+  // chassis.set_swing_pid(ez::RIGHT_SWING, 90, SWING_SPEED);
+  // chassis.wait_drive();
+  // chassis.set_drive_pid(37, 50, true);
+  // chassis.wait_drive();
+  // chassis.set_swing_pid(ez::RIGHT_SWING, 121, SWING_SPEED);
+  // chassis.wait_drive();
+  // chassis.set_drive_pid(-33, DRIVE_SPEED, true);
+  // chassis.wait_until(-15);
+  // outtake();
+  // chassis.wait_drive();
+  // stopIntake();
+  // shoot();
+  stopIntake();
+  wait(250);
+  auton_mode(true);
+  wait(500);
+  auton_mode(false);
 }
 
 
 void awp() {
-
+  chassis.set_drive_pid(4, DRIVE_SPEED, false);
+  chassis.wait_drive();
+  spinRollers();
+  wait(100);
+  chassis.set_drive_pid(-13, DRIVE_SPEED, true);
+  chassis.wait_drive();
+  stopIntake();
+  chassis.set_turn_pid(-14, TURN_SPEED);
+  chassis.wait_drive();
+  shoot();
+  wait(250);
+  chassis.set_drive_pid(7, DRIVE_SPEED, true);
+  chassis.wait_drive();
+  chassis.set_turn_pid(-135, TURN_SPEED);
+  chassis.wait_drive();
+  spinIntake();
+  chassis.set_drive_pid(19, 127, false);
+  chassis.wait_drive();
+  chassis.set_drive_pid(17, 50, true);
+  chassis.wait_drive();
+  chassis.set_turn_pid(-35, TURN_SPEED);
+  chassis.wait_drive();
+  chassis.set_drive_pid(-4, DRIVE_SPEED, true);
+  chassis.wait_drive();
+  stopIntake();
+  shoot();
+  wait(250);
+  spinIntake();
+  chassis.set_drive_pid(5, DRIVE_SPEED, true);
+  chassis.wait_drive();
+  chassis.set_turn_pid(-135, TURN_SPEED);
+  chassis.wait_drive();
+  chassis.set_drive_pid(63, 85, true);
+  chassis.wait_until(58);
+  spinRollers();
+  chassis.wait_drive();
+  wait(500);
+  chassis.set_drive_pid(-55, DRIVE_SPEED, true);
+  chassis.wait_until(-8);
+  spinIntake();
+  chassis.wait_drive();
+  stopIntake();
+  chassis.set_turn_pid(-40, TURN_SPEED);
+  chassis.wait_drive();
+  chassis.set_drive_pid(-4, DRIVE_SPEED, true);
+  chassis.wait_drive();
+  shoot();
+  wait(250);
+  auton_mode(true);
+  wait(500);
+  auton_mode(false);
 }
 
 

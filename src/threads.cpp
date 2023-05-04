@@ -12,9 +12,11 @@ void threadingCatapult(void* p) {
     int shooter_time = 0;
     int cata_state = 0;
     while(true) {
+        if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R2)) shooting = true;
+
         if (cata_state == 0) {
             if (!limit_switch.get_value()) {
-                cata.move_velocity(100);
+                cata.move_velocity(-100);
             } else {              
                 cata.move_velocity(0);
             }
@@ -26,7 +28,7 @@ void threadingCatapult(void* p) {
         }
 
         if (cata_state == 1) {
-            cata.move_velocity(100);
+            cata.move_velocity(-100);
             shooting = false;
 
             if ((pros::millis() - shooter_time) > 250) {
@@ -38,4 +40,21 @@ void threadingCatapult(void* p) {
         pros::delay(10);
     }
 
+}
+void threadingChassis(void *p){
+    while(true){
+        chassis.tank();
+        pros::delay(10);
+    }
+}
+
+void threadingIntake(void *p){
+    while(true){
+        if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) intake.move(120);
+        else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) intake.move(-100);
+        else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) intake.move(100);
+        else intake = 0;
+
+        pros::delay(10);
+    }
 }
